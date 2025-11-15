@@ -351,17 +351,17 @@
                         <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
                             <div class="flex justify-between items-start mb-3">
                                 <h3 class="font-semibold text-gray-700 text-sm">Incidentes o Pérdidas</h3>
-                                <span class="badge badge-success">100%</span>
+                                <span class="badge badge-warning">En Progreso</span>
                             </div>
                             <div class="chart-container">
                                 <canvas id="chartIncidentes"></canvas>
                             </div>
                             <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟢</span>
-                                <span class="status-text status-green">Cumplido</span>
+                                <span class="semaforo-icon">🟡</span>
+                                <span class="status-text status-yellow">En Progreso</span>
                             </div>
                             <div class="kpi-context">
-                                <p><strong>Dato:</strong> 0 (Últ. Mes)</p>
+                                <p><strong>Dato:</strong> 1 (Últ. Mes)</p>
                                 <p><strong>Meta:</strong> 0</p>
                             </div>
                         </div>
@@ -370,14 +370,14 @@
                         <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
                             <div class="flex justify-between items-start mb-3">
                                 <h3 class="font-semibold text-gray-700 text-sm">Cumplimiento del Monitoreo</h3>
-                                <span class="badge badge-success">98%</span>
+                                <span class="badge badge-warning">98%</span>
                             </div>
                             <div class="stat-card">
                                 <div class="stat-value text-blue-800">98%</div>
                                 <div class="stat-label">Viajes monitoreados</div>
                                 <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟢</span>
-                                    <span class="status-text status-green">Cumplido</span>
+                                    <span class="semaforo-icon">🟡</span>
+                                    <span class="status-text status-yellow">En Progreso</span>
                                 </div>
                             </div>
                             <div class="kpi-context">
@@ -873,7 +873,7 @@
             createDoughnutChart('chartGPS', 'Equipado', [vehiculosConGPS, 100 - vehiculosConGPS], ['#2563EB', '#DBEAFE']);
             
             // Número de incidentes o pérdidas...
-            createLineChart('chartIncidentes', ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'], [4, 2, 1, 1, 0, 0], '# Incidentes', '#DC2626');
+            createLineChart('chartIncidentes', ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'], [4, 2, 1, 1, 0, 1], '# Incidentes', '#DC2626');
         }
 
         function renderObj3Charts() {
