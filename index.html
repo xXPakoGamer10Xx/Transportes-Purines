@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transportes Purines - Calidad y Eficiencia en Camino</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #3B82F6 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        @media (min-width: 640px) {
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+        @media (min-width: 768px) {
+            .stat-number {
+                font-size: 3rem;
+            }
+        }
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* --- INICIO DE LA CORRECCIÓN --- */
+        /* Esta regla le dice al navegador que al saltar a #nosotros,
+         deje un margen superior de 6rem (96px), que es la altura
+         de tu barra de navegación fija.
+        */
+        #nosotros {
+            scroll-margin-top: 6rem; /* 96px */
+        }
+        /* --- FIN DE LA CORRECCIÓN --- */
+    </style>
+    <script>
+        // Prevenir scroll automático al recargar la página
+        if (window.location.hash) {
+            // Guardar el hash
+            const hash = window.location.hash;
+            // Remover el hash sin recargar la página
+            history.replaceState(null, null, ' ');
+            // Restaurar el hash después de que la página cargue completamente
+            window.addEventListener('load', function() {
+                // No hacer nada, simplemente eliminar el hash
+            });
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navegación -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 md:py-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <img src="Logo.jpeg" alt="Transportes Purines" class="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 rounded-full object-cover" onerror="this.src='https://placehold.co/64x64/1E3A8A/FFFFFF?text=TP'; this.onerror=null;">
+                    <div class="text-center sm:text-left">
+                        <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-blue-900">Transportes Purines</h1>
+                        <p class="text-xs sm:text-sm text-gray-600">Calidad y Eficiencia en Camino</p>
+                    </div>
+                </div>
+                <a href="dashboard.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg text-sm sm:text-base">
+                    Ver Dashboard 📊
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-20 md:py-32 animate-fade-in">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center mb-6">
+                <img src="Logo.jpeg" alt="Transportes Purines" class="h-32 w-32 md:h-40 md:w-40 rounded-full object-cover shadow-2xl border-4 border-white" onerror="this.src='https://placehold.co/160x160/1E3A8A/FFFFFF?text=TP'; this.onerror=null;">
+            </div>
+            <h2 class="text-4xl md:text-6xl font-bold mb-6">Transportes Purines 🐖</h2>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
+                Líder en transporte especializado de ganado porcino con más de una década de experiencia
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#nosotros" class="bg-white text-blue-800 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-lg">
+                    Conócenos
+                </a>
+                <a href="dashboard.html" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-800 transition-all duration-300">
+                    Dashboard Estratégico
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estadísticas Rápidas -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="stat-number text-blue-800">4</div>
+                    <p class="text-gray-600 mt-2 font-semibold">Años de Experiencia</p>
+                </div>
+                <div class="text-center">
+                    <div class="stat-number text-blue-800">15</div>
+                    <p class="text-gray-600 mt-2 font-semibold">Vehículos en Flota</p>
+                </div>
+                <div class="text-center">
+                    <div class="stat-number text-blue-800">100+</div>
+                    <p class="text-gray-600 mt-2 font-semibold">Clientes Satisfechos</p>
+                </div>
+                <div class="text-center">
+                    <div class="stat-number text-blue-800">98%</div>
+                    <p class="text-gray-600 mt-2 font-semibold">Entregas a Tiempo</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiénes Somos -->
+    <section id="nosotros" class="pt-24 pb-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                    ¿Quiénes Somos?
+                </h3>
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 card-hover">
+                    <div class="space-y-6">
+                        <p class="text-gray-700 text-lg leading-relaxed text-justify">
+                            <strong class="text-blue-800">Transportes Purines</strong> es una empresa enfocada en la distribución y el buen cuidado del ganado porcino en México. Basado en las necesidades del cliente, surge Transporte Purines, una pequeña empresa que busca posicionarse dentro de las mejores en el ámbito del transporte de la ganadería.
+                        </p>
+                        <p class="text-gray-700 text-lg leading-relaxed text-justify">
+                            Nuestra empresa nace con el objetivo de mejorar la eficiencia y el bienestar animal en el transporte de ganado, haciendo que los transportes sean económicamente viables, maximizando la relación de llenado y minimizando el kilometraje recorrido.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Misión y Visión -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                Nuestra Filosofía
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <!-- Misión -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-8 md:p-10 card-hover border-t-4 border-blue-600">
+                    <div class="text-5xl mb-4">🎯</div>
+                    <h4 class="text-2xl font-bold text-blue-900 mb-4">Misión</h4>
+                    <p class="text-gray-700 text-lg leading-relaxed text-justify">
+                        Proporcionar servicios de transporte porcino de alta calidad, asegurando el bienestar animal y la eficiencia operativa en cada etapa del proceso. Nos comprometemos a cumplir con los más altos estándares de seguridad, higiene y puntualidad, ofreciendo soluciones logísticas innovadoras que satisfagan las necesidades de nuestros clientes y contribuyan al desarrollo sostenible de la industria porcina.
+                    </p>
+                </div>
+
+                <!-- Visión -->
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-8 md:p-10 card-hover border-t-4 border-purple-600">
+                    <div class="text-5xl mb-4">🚀</div>
+                    <h4 class="text-2xl font-bold text-purple-900 mb-4">Visión</h4>
+                    <p class="text-gray-700 text-lg leading-relaxed text-justify">
+                        Ser líderes en el sector de transporte porcino, ser reconocidos por nuestra excelencia de servicio, responsabilidad social y ambiental. Estableciendo nuevas estrategias para el bienestar animal durante su transporte y la sostenibilidad, convirtiéndonos en el socio preferido para las granjas y productores porcinos de todo el mundo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Valores -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                Nuestros Valores
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                <!-- Valor 1 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="text-4xl mb-3">🤝</div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-2">Responsabilidad</h5>
+                    <p class="text-gray-600 text-justify">Operamos con integridad y transparencia, cumpliendo con todas las normativas y regulaciones vigentes, y manteniendo un compromiso firme con nuestros clientes y la sociedad.</p>
+                </div>
+
+                <!-- Valor 2 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="text-4xl mb-3">👥</div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-2">Respeto</h5>
+                    <p class="text-gray-600 text-justify">En las relaciones personales tanto internas como externas con cada integrante de la empresa</p>
+                </div>
+
+                <!-- Valor 3 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="text-4xl mb-3">🔒</div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-2">Seguridad</h5>
+                    <p class="text-gray-600 text-justify">Priorizar la seguridad tanto de los animales como de los empleados en cada etapa del proceso de transporte.</p>
+                </div>
+
+                <!-- Valor 4 -->
+                <div class="bg-white rounded-xl shadow-md p-6 text-center card-hover">
+                    <div class="text-4xl mb-3">🌿</div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-2">Sostenibilidad</h5>
+                    <p class="text-gray-600 text-justify">Adoptar prácticas que minimicen el impacto ambiental, como la reducción de emisiones y el uso de combustibles más limpios.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
+                Nuestros Servicios
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Servicio 1 -->
+                <div class="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-lg p-6 card-hover border-l-4 border-blue-600">
+                    <div class="text-4xl mb-4">🚛</div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-3">Transporte Especializado</h5>
+                    <p class="text-gray-600 text-justify">Vehículos equipados con sistemas de ventilación y control de temperatura para garantizar el bienestar animal.</p>
+                </div>
+
+                <!-- Servicio 2 -->
+                <div class="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-lg p-6 card-hover border-l-4 border-green-600">
+                    <div class="text-4xl mb-4">📍</div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-3">Monitoreo GPS</h5>
+                    <p class="text-gray-600 text-justify">Seguimiento en tiempo real de todas nuestras unidades para mayor tranquilidad y control.</p>
+                </div>
+
+                <!-- Servicio 3 -->
+                <div class="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-lg p-6 card-hover border-l-4 border-purple-600">
+                    <div class="text-4xl mb-4">📋</div>
+                    <h5 class="text-xl font-bold text-gray-900 mb-3">Asesoría Logística</h5>
+                    <p class="text-gray-600 text-justify">Planificación de rutas y optimización de procesos de transporte para máxima eficiencia.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Encuéntranos -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        📍 Encuéntranos
+                    </h3>
+                    <p class="text-xl text-gray-600">
+                        Visítanos en nuestra ubicación o contáctanos para más información
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Mapa -->
+                    <div class="relative group">
+                        <a href="https://maps.google.com/?q=González+17,+San+Miguel+Coatlinchan,+56250+Texcoco+de+Mora,+Méx." target="_blank" class="block">
+                            <div class="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300">
+                                <iframe 
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3764.5!2d-98.8833!3d19.4833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f1c7c7c7c7c7%3A0x1c7c7c7c7c7c7c7!2sGonz%C3%A1lez%2017%2C%20San%20Miguel%20Coatlinchan%2C%2056250%20Texcoco%20de%20Mora%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1234567890" 
+                                    width="100%" 
+                                    height="400" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    class="rounded-2xl">
+                                </iframe>
+                                
+                                <!-- Marcador Rojo -->
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full pointer-events-none">
+                                    <div class="relative">
+                                        <!-- Pin rojo -->
+                                        <svg class="w-12 h-12 text-red-600 drop-shadow-lg animate-bounce" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Overlay para hacer clic -->
+                                <div class="absolute inset-0 bg-blue-900/0 group-hover:bg-blue-900/10 transition-all duration-300 flex items-center justify-center rounded-2xl">
+                                    <div class="bg-white px-6 py-3 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-110">
+                                        <p class="text-blue-800 font-bold flex items-center gap-2">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                            </svg>
+                                            Abrir en Google Maps
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Información de Contacto -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="bg-blue-100 p-4 rounded-full">
+                                    <svg class="w-8 h-8 text-blue-800" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-gray-900 mb-2">Dirección</h4>
+                                    <p class="text-gray-700 text-lg">
+                                        González 17, San Miguel Coatlinchan<br>
+                                        56250 Texcoco de Mora, Méx.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="bg-green-100 p-4 rounded-full">
+                                    <svg class="w-8 h-8 text-green-800" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-gray-900 mb-2">Teléfono</h4>
+                                    <a href="tel:+527442690301" class="text-gray-700 text-lg hover:text-blue-600 transition-colors">
+                                        +52 744 269 0301
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <div class="bg-red-100 p-4 rounded-full">
+                                    <svg class="w-8 h-8 text-red-800" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-gray-900 mb-2">Email</h4>
+                                    <a href="mailto:contacto@transportespurines.com" class="text-gray-700 text-lg hover:text-blue-600 transition-colors">
+                                        contacto@transportespurines.com
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="https://maps.google.com/?q=González+17,+San+Miguel+Coatlinchan,+56250+Texcoco+de+Mora,+Méx." target="_blank" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl">
+                            Ver en Google Maps 🗺️
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Redes Sociales y Contacto -->
+    <section class="py-20 bg-gradient-to-br from-blue-900 to-blue-700 text-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h3 class="text-3xl md:text-4xl font-bold mb-6">
+                    Conecta con Nosotros
+                </h3>
+                <p class="text-xl mb-10 opacity-90">
+                    Síguenos en nuestras redes sociales para mantenerte al día con nuestras novedades
+                </p>
+
+                <!-- Redes Sociales -->
+                <div class="flex flex-wrap justify-center gap-6 mb-12">
+                    <!-- Facebook -->
+                    <a href="https://facebook.com/transportespurines" target="_blank" class="social-icon bg-white text-blue-600 p-4 rounded-full shadow-lg hover:shadow-2xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+
+                    <!-- WhatsApp -->
+                    <a href="https://wa.me/5215512345678" target="_blank" class="social-icon bg-white text-green-600 p-4 rounded-full shadow-lg hover:shadow-2xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                        </svg>
+                    </a>
+
+                    <!-- Instagram -->
+                    <a href="https://instagram.com/transportespurines" target="_blank" class="social-icon bg-white text-pink-600 p-4 rounded-full shadow-lg hover:shadow-2xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/>
+                        </svg>
+                    </a>
+
+                    <!-- Email -->
+                    <a href="mailto:contacto@transportespurines.com" class="social-icon bg-white text-red-600 p-4 rounded-full shadow-lg hover:shadow-2xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>
+                    </a>
+
+                    <!-- Teléfono -->
+                    <a href="tel:+52 744 269 0301" class="social-icon bg-white text-blue-600 p-4 rounded-full shadow-lg hover:shadow-2xl">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Información de Contacto -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                        <div>
+                            <h5 class="font-bold text-lg mb-2">📧 Email</h5>
+                            <p>contacto@transportespurines.com</p>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-lg mb-2">📱 Teléfono</h5>
+                            <p>+52 744 269 0301</p>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-lg mb-2">📍 Ubicación</h5>
+                            <p>González 17, San Miguel Coatlinchan, 56250 Texcoco de Mora, Méx.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                ¿Listo para conocer nuestros resultados?
+            </h3>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Accede a nuestro dashboard estratégico y descubre cómo estamos alcanzando nuestros objetivos
+            </p>
+            <a href="dashboard.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-lg font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                Ir al Dashboard 📊
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">&copy; 2025 Transportes Purines. Todos los derechos reservados.</p>
+            <p class="text-gray-400 text-sm">Calidad y Eficiencia en Camino 🚛</p>
+        </div>
+    </footer>
+
+</body>
+</html>
