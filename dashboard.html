@@ -1,713 +1,431 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Estratégico - Transportes Purines</title>
+    
     <!-- Carga Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Carga Chart.js (para gráficos) -->
+    <!-- Carga Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Carga la fuente Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Estilos personalizados */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
-            min-height: 100vh;
-        }
-        .main-container {
-            background-color: #f8fafc;
-            min-height: 100vh;
-            border-radius: 20px;
-            margin: 1rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        @media (min-width: 768px) {
-            .main-container {
-                margin: 2rem;
+    <!-- Carga Fuentes Google (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Carga Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        purines: {
+                            blue: '#1E3A8A',
+                            light: '#3B82F6',
+                            accent: '#2563EB',
+                            bg: '#F8FAFC' // Slate-50
+                        }
+                    }
+                }
             }
         }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 220px;
-        }
-        .tab-content { display: none; }
-        .nav-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-        }
-        .nav-wrapper::-webkit-scrollbar {
-            height: 4px;
-        }
-        .nav-wrapper::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .nav-button {
-            transition: all 0.3s ease;
-            border-bottom-width: 3px;
-            border-color: transparent;
-            white-space: nowrap;
-            min-width: fit-content;
-        }
-        .nav-button.active {
-            border-color: #1E3A8A;
-            color: #1E3A8A;
-            font-weight: 600;
-            background-color: #DBEAFE;
-        }
-        .nav-button:hover { 
-            background-color: #f1f5f9;
-            transform: translateY(-2px);
-        }
+    </script>
+    <style>
+        /* Animaciones suaves para tarjetas */
         .kpi-card {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
             transition: all 0.3s ease;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #e2e8f0;
         }
         .kpi-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #3B82F6;
         }
-        .stat-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            flex: 1;
+        
+        /* Estilo para pestañas activas */
+        .tab-btn.active {
+            background-color: #1E3A8A;
+            color: white;
+            border-color: #1E3A8A;
         }
-        .stat-value {
-            font-size: 3rem;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            width: 100%;
+        
+        /* Animación de entrada */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
         }
-        @media (max-width: 640px) {
-            .stat-value {
-                font-size: 2.5rem;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .stat-label {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 0.5rem;
-            text-align: center;
-        }
-        .kpi-context {
-            font-size: 0.8rem;
-            text-align: left;
-            margin-top: auto;
-            padding-top: 0.75rem;
-            border-top: 1px solid #e5e7eb;
-            color: #6b7280;
-        }
-        .kpi-context strong {
-            color: #111827;
-        }
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-        .badge-success {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-        .badge-warning {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        .badge-danger {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        .logo-container {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            padding: 5px;
-            overflow: hidden;
-        }
-        .logo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-        /* Estilos para indicadores de semáforo */
-        .semaforo-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        .semaforo-icon {
-            font-size: 1.5rem;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        .status-text {
-            font-size: 0.875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .status-green { color: #16a34a; }
-        .status-yellow { color: #ca8a04; }
-        .status-red { color: #dc2626; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="bg-slate-50 text-slate-800 font-sans">
 
-    <div class="main-container">
-        <div class="container mx-auto p-3 sm:p-4 md:p-6 lg:p-8">
-
-            <!-- Encabezado de la página -->
-            <header class="bg-gradient-to-r from-blue-800 to-blue-600 rounded-xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 text-white shadow-lg">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
-                        <div class="logo-container">
-                            <img src="Logo.jpeg" alt="Transportes Purines Logo" onerror="this.src='https://placehold.co/100x100/1E3A8A/FFFFFF?text=TP'; this.onerror=null;">
-                        </div>
-                        <div>
-                            <h1 class="text-xl sm:text-2xl md:text-4xl font-bold">Dashboard Estratégico</h1>
-                            <p class="text-base sm:text-lg md:text-xl font-medium mt-1 opacity-90">Transportes Purines 🐖</p>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-3 w-full sm:w-auto">
-                        <a href="index.html" class="bg-white text-blue-800 px-4 sm:px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 text-center shadow-md text-sm md:text-base">
-                            ← Volver al Inicio
-                        </a>
-                        <div class="text-center md:text-right">
-                            <p class="text-xs sm:text-sm opacity-75">Última actualización</p>
-                            <p class="text-base sm:text-lg font-semibold">Noviembre 2025</p>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Barra de Navegación por Pestañas -->
-            <nav class="bg-white rounded-xl shadow-md mb-6 md:mb-8 overflow-hidden">
-                <div class="nav-wrapper">
-                    <div class="flex border-b border-gray-200">
-                        <!-- Títulos de pestañas actualizados desde el PDF -->
-                        <button id="btn-obj1" class="nav-button p-3 sm:p-4 text-xs sm:text-sm md:text-base text-gray-600 flex-1" onclick="showTab('obj1')">
-                            <span class="hidden sm:inline">1. </span>Expandir Flota
-                        </button>
-                        <button id="btn-obj2" class="nav-button p-3 sm:p-4 text-xs sm:text-sm md:text-base text-gray-600 flex-1" onclick="showTab('obj2')">
-                            <span class="hidden sm:inline">2. </span>Seguimiento
-                        </button>
-                        <button id="btn-obj3" class="nav-button p-4 text-sm md:text-base text-gray-600 flex-1" onclick="showTab('obj3')">
-                            <span class="hidden md:inline">3. </span>Alianzas
-                        </button>
-                        <button id="btn-obj4" class="nav-button p-4 text-sm md:text-base text-gray-600 flex-1" onclick="showTab('obj4')">
-                            <span class="hidden md:inline">4. </span>Personal
-                        </button>
-                        <button id="btn-obj5" class="nav-button p-4 text-sm md:text-base text-gray-600 flex-1" onclick="showTab('obj5')">
-                            <span class="hidden md:inline">5. </span>Marketing
-                        </button>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Contenido Principal -->
-            <main>
-                <!-- ====== OBJETIVO 1: EXPANDIR FLOTA ====== -->
-                <div id="obj1" class="tab-content">
-                    <div class="bg-white rounded-lg p-4 md:p-6 mb-6 shadow-sm">
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-900">1. Expandir la flota de vehículos para cubrir nuevas rutas</h2>
-                        <p class="text-gray-600 mt-2">Indicadores clave de rendimiento para la expansión vehicular</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    
-                        <!-- Tarjeta de KPI: Unidades Nuevas -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Unidades Nuevas Incorporadas</h3>
-                                <span class="badge badge-warning">60%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-800">3</div>
-                                <div class="stat-label">de 5 vehículos meta</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟡</span>
-                                    <span class="status-text status-yellow">En Progreso</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 5 unidades</p>
-                                <p><strong>Fórmula:</strong> Conteo de vehículos nuevos</p>
-                            </div>
-                        </div>
-                    
-                        <!-- Tarjeta de KPI: Incremento Rutas -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Incremento de Rutas</h3>
-                                <span class="badge badge-warning">75%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-700">15%</div>
-                                <div class="stat-label">Meta: 20%</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟡</span>
-                                    <span class="status-text status-yellow">En Progreso</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 20%</p>
-                                <p><strong>Fórmula:</strong> (Rutas Actuales - Rutas Previas) / Rutas Previas</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Satisfacción por Disponibilidad -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Satisfacción por Disponibilidad</h3>
-                                <span class="badge badge-warning">78%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartSatDisp"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟡</span>
-                                <span class="status-text status-yellow">En Progreso</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 66% (Satisfecho)</p>
-                                <p><strong>Meta:</strong> 85%</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Tasa de Utilización -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Tasa de Utilización de Vehículos</h3>
-                                <span class="badge badge-success">94%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartUtiVeh"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟢</span>
-                                <span class="status-text status-green">Cumplido</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 75% (Utilizado)</p>
-                                <p><strong>Meta:</strong> 80%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ====== OBJETIVO 2: IMPLEMENTAR SEGUIMIENTO ====== -->
-                <div id="obj2" class="tab-content">
-                    <div class="bg-white rounded-lg p-4 md:p-6 mb-6 shadow-sm">
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-900">2. Implementar sistema de seguimiento y monitoreo</h2>
-                        <p class="text-gray-600 mt-2">Indicadores de tecnología y seguridad operativa</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    
-                        <!-- Tarjeta de KPI: Vehículos con GPS -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Vehículos con GPS</h3>
-                                <span class="badge badge-warning">80%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartGPS"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟡</span>
-                                <span class="status-text status-yellow">En Progreso</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 80% (12 / 15 vehículos)</p>
-                                <p><strong>Meta:</strong> 100%</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Incidentes -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Incidentes o Pérdidas</h3>
-                                <span class="badge badge-warning">En Progreso</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartIncidentes"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟡</span>
-                                <span class="status-text status-yellow">En Progreso</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 1 (Últ. Mes)</p>
-                                <p><strong>Meta:</strong> 0</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Cumplimiento Monitoreo -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Cumplimiento del Monitoreo</h3>
-                                <span class="badge badge-warning">98%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-800">98%</div>
-                                <div class="stat-label">Viajes monitoreados</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟡</span>
-                                    <span class="status-text status-yellow">En Progreso</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 100%</p>
-                                <p><strong>Fórmula:</strong> (Viajes Monitoreados / Viajes Totales)</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Tiempo de Respuesta -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Tiempo de Respuesta</h3>
-                                <span class="badge badge-success">100%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-700">8</div>
-                                <div class="stat-label">Minutos (Meta: < 10 min)</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟢</span>
-                                    <span class="status-text status-green">Cumplido</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> < 10 Minutos</p>
-                                <p><strong>Fórmula:</strong> Suma(Tiempos de Respuesta) / # Alertas</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ====== OBJETIVO 3: ESTABLECER ALIANZAS ====== -->
-                <div id="obj3" class="tab-content">
-                    <div class="bg-white rounded-lg p-4 md:p-6 mb-6 shadow-sm">
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-900">3. Establecer alianzas estratégicas</h2>
-                        <p class="text-gray-600 mt-2">Indicadores de colaboración y servicios complementarios</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    
-                        <!-- Tarjeta de KPI: Convenios Firmados -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Convenios Firmados</h3>
-                                <span class="badge badge-danger">67%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-800">4</div>
-                                <div class="stat-label">de 6 proveedores meta</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🔴</span>
-                                    <span class="status-text status-red">Crítico</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 6</p>
-                                <p><strong>Fórmula:</strong> Conteo de convenios activos</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Servicios Complementarios -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Servicios Complementarios</h3>
-                                <span class="badge badge-warning">72%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-700">18%</div>
-                                <div class="stat-label">Meta: 25%</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟡</span>
-                                    <span class="status-text status-yellow">En Progreso</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 25%</p>
-                                <p><strong>Fórmula:</strong> (Clientes c/ Serv. Extra / Clientes Totales)</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Satisfacción Servicios Integrales -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Satisfacción Servicios Integrales</h3>
-                                <span class="badge badge-warning">75%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartSatInt"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟡</span>
-                                <span class="status-text status-yellow">En Progreso</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 60% (Satisfecho)</p>
-                                <p><strong>Meta:</strong> 80%</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Colaboraciones Activas -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Colaboraciones Activas</h3>
-                                <span class="badge badge-danger">50%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-orange-600">5</div>
-                                <div class="stat-label">de 10 servicios meta/mes</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🔴</span>
-                                    <span class="status-text status-red">Crítico</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 10 / mes</p>
-                                <p><strong>Fórmula:</strong> Conteo de servicios conjuntos</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Navegación Fija (Idéntica al Index) -->
+    <nav class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-50 border-b border-slate-200">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="Logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full object-cover shadow-md" onerror="this.src='https://placehold.co/40x40/1E3A8A/FFFFFF?text=TP'">
+                <span class="font-bold text-purines-blue text-lg hidden sm:block">Transportes Purines</span>
+            </div>
             
-                <!-- ====== OBJETIVO 4: CAPACITAR PERSONAL ====== -->
-                <div id="obj4" class="tab-content">
-                    <div class="bg-white rounded-lg p-4 md:p-6 mb-6 shadow-sm">
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-900">4. Capacitar al personal en técnicas de manejo</h2>
-                        <p class="text-gray-600 mt-2">Indicadores de desarrollo y certificación del personal</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-
-                        <!-- Tarjeta de KPI: Capacitaciones Impartidas -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Capacitaciones Impartidas</h3>
-                                <span class="badge badge-success">100%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-800">4</div>
-                                <div class="stat-label">Sesiones completadas</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟢</span>
-                                    <span class="status-text status-green">Cumplido</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 4</p>
-                                <p><strong>Fórmula:</strong> Conteo de sesiones</p>
-                            </div>
-                        </div>
-                    
-                        <!-- Tarjeta de KPI: Personal Certificado -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Personal Certificado</h3>
-                                <span class="badge badge-warning">80%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartCert"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟡</span>
-                                <span class="status-text status-yellow">En Progreso</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 80% (12 / 15 personal)</p>
-                                <p><strong>Meta:</strong> 100%</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Evaluación Promedio -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Evaluación Promedio</h3>
-                                <span class="badge badge-success">101%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-700">9.1</div>
-                                <div class="stat-label">de 10 (Meta: 9.0)</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟢</span>
-                                    <span class="status-text status-green">Cumplido</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 9.0</p>
-                                <p><strong>Fórmula:</strong> Suma(Evaluaciones) / # Evaluados</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Reducción Incidentes -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Reducción de Incidentes</h3>
-                                <span class="badge badge-warning">82%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartRedInc"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟡</span>
-                                <span class="status-text status-yellow">En Progreso</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 70% (Reducción)</p>
-                                <p><strong>Meta:</strong> 85%</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex flex-col text-right mr-4">
+                    <span class="text-xs text-slate-500 font-medium uppercase tracking-wider">Última Actualización</span>
+                    <span class="text-sm font-bold text-slate-800">Noviembre 2025</span>
                 </div>
-
-                <!-- ====== OBJETIVO 5: DESARROLLAR MARKETING ====== -->
-                <div id="obj5" class="tab-content">
-                    <div class="bg-white rounded-lg p-4 md:p-6 mb-6 shadow-sm">
-                        <h2 class="text-xl md:text-2xl font-bold text-gray-900">5. Desarrollar campaña de marketing y comunicación</h2>
-                        <p class="text-gray-600 mt-2">Indicadores de alcance, marca y crecimiento de clientes</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    
-                        <!-- Tarjeta de KPI: Alcance de Campaña -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Alcance de Campaña</h3>
-                                <span class="badge badge-danger">20%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-orange-600">10K</div>
-                                <div class="stat-label">de 50K impresiones meta</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🔴</span>
-                                    <span class="status-text status-red">Crítico</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 50K</p>
-                                <p><strong>Fórmula:</strong> Suma de impresiones (Ads + Orgánico)</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Reconocimiento de Marca -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Reconocimiento de Marca</h3>
-                                <span class="badge badge-warning">88%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartMarca"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟡</span>
-                                <span class="status-text status-yellow">En Progreso</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 35% (vs 20% anterior)</p>
-                                <p><strong>Meta:</strong> 40%</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Crecimiento Clientes -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Crecimiento Clientes Nuevos</h3>
-                                <span class="badge badge-success">127%</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chartClientes"></canvas>
-                            </div>
-                            <div class="semaforo-indicator" style="justify-content: center; margin-bottom: 0.5rem;">
-                                <span class="semaforo-icon">🟢</span>
-                                <span class="status-text status-green">Cumplido</span>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Dato:</strong> 38 Clientes Nuevos</p>
-                                <p><strong>Meta:</strong> 30</p>
-                            </div>
-                        </div>
-
-                        <!-- Tarjeta de KPI: Interacción Redes Sociales -->
-                        <div class="bg-white p-6 rounded-xl shadow-md kpi-card">
-                            <div class="flex justify-between items-start mb-3">
-                                <h3 class="font-semibold text-gray-700 text-sm">Engagement Redes Sociales</h3>
-                                <span class="badge badge-success">116%</span>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value text-blue-800">5.2%</div>
-                                <div class="stat-label">Tasa (Meta: 4.5%)</div>
-                                <div class="semaforo-indicator">
-                                    <span class="semaforo-icon">🟢</span>
-                                    <span class="status-text status-green">Cumplido</span>
-                                </div>
-                            </div>
-                            <div class="kpi-context">
-                                <p><strong>Meta:</strong> 4.5%</p>
-                                <p><strong>Fórmula:</strong> (Interacciones / Alcance) * 100</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </main>
+                <a href="index.html" class="group flex items-center gap-2 text-slate-600 hover:text-purines-blue font-medium transition-colors px-3 py-2 rounded-lg hover:bg-slate-100">
+                    <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i>
+                    Volver al Inicio
+                </a>
+            </div>
         </div>
-    </div>
+    </nav>
 
-    <!-- JavaScript para la interactividad de pestañas y gráficos -->
-    <script>
-        // Objeto para almacenar las instancias de los gráficos y poder destruirlos
-        const chartInstances = {};
+    <!-- Encabezado Principal -->
+    <header class="pt-28 pb-10 px-4 bg-white border-b border-slate-200">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Dashboard Estratégico</h1>
+                    <p class="text-slate-500 text-lg">Monitoreo de KPIs y cumplimiento de objetivos 2025.</p>
+                </div>
+                <!-- Resumen Rápido -->
+                <div class="flex gap-3">
+                    <div class="bg-green-50 px-4 py-2 rounded-lg border border-green-100">
+                        <span class="text-xs text-green-600 font-bold uppercase">Cumplimiento Global</span>
+                        <div class="text-xl font-bold text-green-700">82%</div>
+                    </div>
+                    <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
+                        <span class="text-xs text-blue-600 font-bold uppercase">Objetivos Activos</span>
+                        <div class="text-xl font-bold text-blue-700">5</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 py-8">
         
-        // Constantes para cálculos (basadas en datos del dashboard)
-        const TOTAL_VEHICULOS = 15;
-        const TOTAL_PERSONAL = 15;
+        <!-- Navegación de Pestañas -->
+        <div class="mb-8 overflow-x-auto pb-2">
+            <div class="flex gap-2 min-w-max">
+                <button onclick="showTab('obj1')" id="btn-obj1" class="tab-btn active px-5 py-2.5 rounded-full text-sm font-semibold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition-colors flex items-center gap-2">
+                    <i data-lucide="truck" class="w-4 h-4"></i> Flota
+                </button>
+                <button onclick="showTab('obj2')" id="btn-obj2" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition-colors flex items-center gap-2">
+                    <i data-lucide="radar" class="w-4 h-4"></i> Seguimiento
+                </button>
+                <button onclick="showTab('obj3')" id="btn-obj3" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition-colors flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4"></i> Alianzas
+                </button>
+                <button onclick="showTab('obj4')" id="btn-obj4" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition-colors flex items-center gap-2">
+                    <i data-lucide="graduation-cap" class="w-4 h-4"></i> Personal
+                </button>
+                <button onclick="showTab('obj5')" id="btn-obj5" class="tab-btn px-5 py-2.5 rounded-full text-sm font-semibold border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition-colors flex items-center gap-2">
+                    <i data-lucide="megaphone" class="w-4 h-4"></i> Marketing
+                </button>
+            </div>
+        </div>
 
-        /**
-         * Crea un gráfico de Dona (Doughnut Chart)
-         * @param {string} canvasId - ID del elemento <canvas>
-         * @param {string} label - Etiqueta para el dato principal
-         * @param {number[]} data - Array con 2 valores [valor, 100 - valor]
-         * @param {string[]} colors - Array con 2 colores [color_principal, color_fondo]
-         */
-        function createDoughnutChart(canvasId, label, data, colors) {
-            // Si el gráfico ya existe, lo destruye para evitar errores
-            if (chartInstances[canvasId]) {
-                chartInstances[canvasId].destroy();
-            }
+        <!-- ====== OBJETIVO 1: FLOTA ====== -->
+        <div id="obj1" class="tab-content fade-in block">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-slate-800">Expandir la Flota</h2>
+                <p class="text-slate-500 text-sm">Crecimiento vehicular para cobertura de nuevas rutas.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI 1 -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-blue-100 p-2 rounded-lg">
+                            <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded-full">En Progreso</span>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">3 <span class="text-sm text-slate-400 font-normal">/ 5</span></div>
+                    <p class="text-slate-500 text-sm font-medium">Unidades Nuevas</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400">
+                        Meta: 5 unidades para fin de año
+                    </div>
+                </div>
+
+                <!-- KPI 2 -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-blue-100 p-2 rounded-lg">
+                            <i data-lucide="map" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded-full">75% Meta</span>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">15%</div>
+                    <p class="text-slate-500 text-sm font-medium">Incremento de Rutas</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400">
+                        Objetivo anual: 20%
+                    </div>
+                </div>
+
+                <!-- KPI Chart 1 -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-4">Satisfacción Disponibilidad</h3>
+                    <div class="h-32 relative">
+                        <canvas id="chartSatDisp"></canvas>
+                    </div>
+                    <div class="text-center mt-2">
+                        <span class="text-2xl font-bold text-slate-800">66%</span>
+                        <span class="text-xs text-slate-400 block">Meta: 85%</span>
+                    </div>
+                </div>
+
+                <!-- KPI Chart 2 -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-4">Tasa de Utilización</h3>
+                    <div class="h-32 relative">
+                        <canvas id="chartUtiVeh"></canvas>
+                    </div>
+                    <div class="text-center mt-2">
+                        <span class="text-2xl font-bold text-green-600">94%</span>
+                        <span class="text-xs text-slate-400 block">Eficiencia Alta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== OBJETIVO 2: SEGUIMIENTO ====== -->
+        <div id="obj2" class="tab-content fade-in hidden">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-slate-800">Sistema de Seguimiento</h2>
+                <p class="text-slate-500 text-sm">Tecnología GPS y monitoreo en tiempo real.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI GPS -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-2">Flota con GPS</h3>
+                    <div class="h-40 relative flex items-center justify-center">
+                        <canvas id="chartGPS"></canvas>
+                    </div>
+                    <div class="mt-2 text-center text-sm text-slate-500">12 de 15 Vehículos</div>
+                </div>
+
+                <!-- KPI Incidentes Line Chart -->
+                <div class="kpi-card bg-white p-6 rounded-xl col-span-1 md:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-semibold text-slate-700">Tendencia de Incidentes</h3>
+                        <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">Bajando ▼</span>
+                    </div>
+                    <div class="h-48 w-full">
+                        <canvas id="chartIncidentes"></canvas>
+                    </div>
+                </div>
+
+                <!-- KPI Respuesta -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-green-100 p-2 rounded-lg">
+                            <i data-lucide="clock" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">Excelente</span>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">8 <span class="text-sm text-slate-400 font-normal">min</span></div>
+                    <p class="text-slate-500 text-sm font-medium">Tiempo de Respuesta</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400">
+                        Meta: Menos de 10 min
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== OBJETIVO 3: ALIANZAS ====== -->
+        <div id="obj3" class="tab-content fade-in hidden">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-slate-800">Alianzas Estratégicas</h2>
+                <p class="text-slate-500 text-sm">Relaciones comerciales y servicios integrales.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI Convenios -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-red-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-red-50 p-2 rounded-lg">
+                            <i data-lucide="handshake" class="w-5 h-5 text-red-500"></i>
+                        </div>
+                        <span class="text-red-600 text-xs font-bold">Atención Requerida</span>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">4</div>
+                    <p class="text-slate-500 text-sm font-medium">Convenios Firmados</p>
+                    <p class="text-xs text-red-400 mt-1">Meta: 6 convenios</p>
+                </div>
+
+                <!-- KPI Servicios -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-blue-100 p-2 rounded-lg">
+                            <i data-lucide="layers" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">18%</div>
+                    <p class="text-slate-500 text-sm font-medium">Servicios Complementarios</p>
+                </div>
+
+                <!-- KPI Satisfaccion Chart -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-2">Satisfacción Servicios</h3>
+                    <div class="h-40 relative">
+                        <canvas id="chartSatInt"></canvas>
+                    </div>
+                </div>
+
+                <!-- KPI Colaboraciones -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-red-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-red-50 p-2 rounded-lg">
+                            <i data-lucide="users" class="w-5 h-5 text-red-500"></i>
+                        </div>
+                        <span class="text-red-600 text-xs font-bold">Crítico</span>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">5</div>
+                    <p class="text-slate-500 text-sm font-medium">Colaboraciones Activas</p>
+                    <p class="text-xs text-red-400 mt-1">Meta: 10/mes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== OBJETIVO 4: PERSONAL ====== -->
+        <div id="obj4" class="tab-content fade-in hidden">
+             <div class="mb-6">
+                <h2 class="text-xl font-bold text-slate-800">Capacitación y Talento</h2>
+                <p class="text-slate-500 text-sm">Desarrollo profesional y certificación del equipo.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- KPI Capacitaciones -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-green-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-green-50 p-2 rounded-lg">
+                            <i data-lucide="check-square" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <span class="text-green-600 text-xs font-bold">100% Cumplido</span>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">4</div>
+                    <p class="text-slate-500 text-sm font-medium">Sesiones Impartidas</p>
+                </div>
+
+                <!-- Chart Certificados -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-2">Personal Certificado</h3>
+                    <div class="h-40 relative">
+                        <canvas id="chartCert"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-slate-400 mt-2">12 de 15 empleados</p>
+                </div>
+
+                <!-- KPI Evaluacion -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-yellow-100 p-2 rounded-lg">
+                            <i data-lucide="star" class="w-5 h-5 text-yellow-600"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">9.1 <span class="text-sm text-slate-400 font-normal">/ 10</span></div>
+                    <p class="text-slate-500 text-sm font-medium">Evaluación Promedio</p>
+                </div>
+
+                 <!-- KPI Reducción Incidentes Chart -->
+                 <div class="kpi-card bg-white p-6 rounded-xl">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-2">Reducción Incidentes</h3>
+                    <div class="h-32 w-full">
+                        <canvas id="chartRedInc"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== OBJETIVO 5: MARKETING ====== -->
+        <div id="obj5" class="tab-content fade-in hidden">
+             <div class="mb-6">
+                <h2 class="text-xl font-bold text-slate-800">Marketing y Marca</h2>
+                <p class="text-slate-500 text-sm">Posicionamiento y crecimiento de audiencia.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- KPI Alcance -->
+                <div class="kpi-card bg-white p-6 rounded-xl border-l-4 border-red-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-red-50 p-2 rounded-lg">
+                            <i data-lucide="eye" class="w-5 h-5 text-red-500"></i>
+                        </div>
+                        <span class="text-red-600 text-xs font-bold">20% Meta</span>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-800 mb-1">10K</div>
+                    <p class="text-slate-500 text-sm font-medium">Alcance de Campaña</p>
+                    <p class="text-xs text-slate-400 mt-1">Meta: 50K Impresiones</p>
+                </div>
+
+                <!-- Chart Marca -->
+                <div class="kpi-card bg-white p-6 rounded-xl">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-2">Reconocimiento Marca</h3>
+                    <div class="h-40 w-full">
+                        <canvas id="chartMarca"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart Clientes -->
+                <div class="kpi-card bg-white p-6 rounded-xl col-span-1 md:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-semibold text-slate-700">Crecimiento de Clientes</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">+127% vs Meta</span>
+                        </div>
+                    </div>
+                    <div class="h-48 w-full">
+                        <canvas id="chartClientes"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Simple -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8">
+        <div class="container mx-auto px-4 text-center text-slate-400 text-sm">
+            &copy; 2025 Transportes Purines. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <!-- Lógica de Gráficos e Interactividad -->
+    <script>
+        // Inicializar Iconos Lucide
+        lucide.createIcons();
+
+        // Configuración Global de Chart.js para que combine con el diseño
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b'; // slate-500
+        Chart.defaults.scale.grid.color = '#f1f5f9'; // slate-100
+
+        const chartInstances = {};
+
+        // Función Helper para crear Donas
+        function createDoughnut(canvasId, value, colorHex) {
             const ctx = document.getElementById(canvasId).getContext('2d');
+            if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+            
             chartInstances[canvasId] = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: [label, 'Restante'],
+                    labels: ['Completado', 'Restante'],
                     datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderColor: ['#ffffff', '#ffffff'],
-                        borderWidth: 3
+                        data: [value, 100 - value],
+                        backgroundColor: [colorHex, '#e2e8f0'], // Color principal vs slate-200
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
                 },
                 options: {
@@ -715,85 +433,38 @@
                     maintainAspectRatio: false,
                     cutout: '75%',
                     plugins: {
-                        legend: { 
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 10,
-                                font: { size: 11 }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            padding: 12,
-                            titleFont: { size: 13, weight: 'bold' },
-                            bodyFont: { size: 12 },
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.raw}%`;
-                                }
-                            }
-                        }
-                    },
-                    // Plugin para mostrar el porcentaje en el centro
-                    layout: {
-                        padding: 10
+                        legend: { display: false },
+                        tooltip: { enabled: false }
                     }
                 },
+                // Plugin para texto central
                 plugins: [{
-                    id: 'centerText',
-                    afterDraw: function(chart) {
-                        // --- INICIO DE LA CORRECCIÓN ---
-
-                        // 1. Asegurarse que el área del gráfico esté lista
-                        if (!chart.chartArea) {
-                            return;
-                        }
-
-                        const ctx = chart.ctx;
+                    id: 'textCenter',
+                    beforeDraw: function(chart) {
+                        var width = chart.width,
+                            height = chart.height,
+                            ctx = chart.ctx;
+                        ctx.restore();
+                        var fontSize = (height / 114).toFixed(2);
+                        ctx.font = "bold " + fontSize + "em Inter";
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = "#1e293b"; // slate-800
                         
-                        // 2. Calcular tamaño de fuente basado en el ÁREA DEL GRÁFICO
-                        // El 'height' del canvas original incluye la leyenda,
-                        // lo que da un 'fontSize' desproporcionado.
-                        const chartAreaHeight = chart.chartArea.bottom - chart.chartArea.top;
-                        const chartAreaWidth = chart.chartArea.right - chart.chartArea.left;
-                        const fontSize = Math.min(chartAreaWidth, chartAreaHeight) * 0.16;
-                        
-                        ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-                        ctx.textBaseline = 'middle';
-                        ctx.textAlign = 'center';
-                        
-                        const text = `${data[0]}%`;
-                        
-                        // 3. Centrar usando el CENTRO DEL ÁREA DEL GRÁFICO
-                        // (chart.height / 2) es incorrecto porque la leyenda en 'bottom'
-                        // empuja el gráfico hacia arriba.
-                        const textX = (chart.chartArea.left + chart.chartArea.right) / 2;
-                        const textY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
-                        
-                        ctx.fillStyle = colors[0];
+                        var text = value + "%",
+                            textX = Math.round((width - ctx.measureText(text).width) / 2),
+                            textY = height / 2;
                         ctx.fillText(text, textX, textY);
-                        
-                        // --- FIN DE LA CORRECCIÓN ---
+                        ctx.save();
                     }
                 }]
             });
         }
 
-        /**
-         * Crea un gráfico de Línea (Line Chart)
-         * @param {string} canvasId - ID del elemento <canvas>
-         * @param {string[]} labels - Etiquetas para el eje X (ej. meses)
-         * @param {number[]} data - Array de valores para el eje Y
-         * @param {string} label - Título del set de datos
-         * @param {string} borderColor - Color de la línea y el área
-         */
-        function createLineChart(canvasId, labels, data, label, borderColor) {
-            if (chartInstances[canvasId]) {
-                chartInstances[canvasId].destroy();
-            }
+        // Función Helper para Líneas
+        function createLine(canvasId, labels, data, label, color) {
             const ctx = document.getElementById(canvasId).getContext('2d');
+            if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+
             chartInstances[canvasId] = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -801,184 +472,109 @@
                     datasets: [{
                         label: label,
                         data: data,
-                        borderColor: borderColor,
-                        backgroundColor: borderColor + '20',
+                        borderColor: color,
+                        backgroundColor: color + '20', // Opacidad
                         fill: true,
                         tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        pointBackgroundColor: borderColor,
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: color,
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { 
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 10,
-                                font: { size: 11 }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            padding: 12,
-                            titleFont: { size: 13, weight: 'bold' },
-                            bodyFont: { size: 12 }
-                        }
+                    plugins: {
+                        legend: { display: false }
                     },
                     scales: {
-                        y: { 
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(0,0,0,0.05)'
-                            },
-                            ticks: {
-                                font: { size: 11 }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: { size: 11 }
-                            }
-                        }
+                        y: { beginAtZero: true, grid: { display: true, drawBorder: false } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
         }
 
-        // --- Funciones para Renderizar Gráficos por Pestaña ---
-
-        function renderObj1Charts() {
-            // Nivel de satisfacción... por disponibilidad
-            const satDisp = 66; 
-            createDoughnutChart('chartSatDisp', 'Satisfecho', [satDisp, 100 - satDisp], ['#1E3A8A', '#DBEAFE']);
-
-            // Tasa de utilización de vehículos (%)
-            createDoughnutChart('chartUtiVeh', 'Utilizado', [75, 25], ['#2563EB', '#DBEAFE']);
+        // Renderizadores por Tab
+        function renderObj1() {
+            createDoughnut('chartSatDisp', 66, '#3B82F6'); // blue-500
+            createDoughnut('chartUtiVeh', 75, '#22c55e'); // green-500
         }
 
-        function renderObj2Charts() {
-            // % de vehículos equipados con GPS...
-            const vehiculosConGPS = Math.round((12 / TOTAL_VEHICULOS) * 100); // 80%
-            createDoughnutChart('chartGPS', 'Equipado', [vehiculosConGPS, 100 - vehiculosConGPS], ['#2563EB', '#DBEAFE']);
-            
-            // Número de incidentes o pérdidas...
-            createLineChart('chartIncidentes', ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'], [4, 2, 1, 1, 0, 1], '# Incidentes', '#DC2626');
+        function renderObj2() {
+            createDoughnut('chartGPS', 80, '#3B82F6');
+            createLine('chartIncidentes', ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'], [4, 2, 1, 1, 0, 1], 'Incidentes', '#ef4444');
         }
 
-        function renderObj3Charts() {
-            // Nivel de satisfacción de clientes por serv. integrales
-            const satInt = 60;
-            createDoughnutChart('chartSatInt', 'Satisfecho', [satInt, 100 - satInt], ['#2563EB', '#DBEAFE']);
+        function renderObj3() {
+            createDoughnut('chartSatInt', 60, '#3B82F6');
         }
 
-        function renderObj4Charts() {
-            // % de personal certificado o capacitado
-            const personalCertificado = Math.round((12 / TOTAL_PERSONAL) * 100); // 80%
-            createDoughnutChart('chartCert', 'Certificado', [personalCertificado, 100 - personalCertificado], ['#1E3A8A', '#DBEAFE']);
-            
-            // Reducción de incidentes (mal manejo)... (Datos simulados trimestrales)
-            createLineChart('chartRedInc', ['Q1', 'Q2', 'Q3', 'Q4'], [7, 5, 3, 2], '# Incidentes', '#2563EB');
+        function renderObj4() {
+            createDoughnut('chartCert', 80, '#3B82F6');
+            createLine('chartRedInc', ['Q1', 'Q2', 'Q3', 'Q4'], [7, 5, 3, 2], 'Incidentes', '#3B82F6');
         }
 
-        function renderObj5Charts() {
-            // Incremento de reconocimiento de marca (%)
-            if (chartInstances.chartMarca) chartInstances.chartMarca.destroy();
-            const ctxMarca = document.getElementById('chartMarca').getContext('2d');
-            chartInstances.chartMarca = new Chart(ctxMarca, {
+        function renderObj5() {
+            // Chart Barras Marca
+            const ctxM = document.getElementById('chartMarca').getContext('2d');
+            if(chartInstances['chartMarca']) chartInstances['chartMarca'].destroy();
+            chartInstances['chartMarca'] = new Chart(ctxM, {
                 type: 'bar',
                 data: {
-                    labels: ['Año Anterior', 'Año Actual'],
+                    labels: ['Anterior', 'Actual'],
                     datasets: [{
-                        label: 'Reconocimiento',
+                        label: '% Reconocimiento',
                         data: [20, 35],
-                        backgroundColor: ['#94a3b8', '#1E3A8A'],
-                        borderRadius: 8,
-                        borderWidth: 0
+                        backgroundColor: ['#cbd5e1', '#1E3A8A'],
+                        borderRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            padding: 12,
-                            titleFont: { size: 13, weight: 'bold' },
-                            bodyFont: { size: 12 },
-                            callbacks: {
-                                label: function(context) { return `${context.label}: ${context.raw}%`; }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: { 
-                            beginAtZero: true,
-                            max: 50,
-                            grid: {
-                                color: 'rgba(0,0,0,0.05)'
-                            },
-                            ticks: {
-                                font: { size: 11 },
-                                callback: function(value) { return value + '%' }
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { size: 11 } }
-                        }
-                    }
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 50 } }
                 }
             });
-            
-            // Crecimiento de la base de clientes nuevos (%)
-            createLineChart('chartClientes', ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'], [15, 18, 25, 30, 32, 38], 'Clientes Nuevos', '#2563EB');
+
+            createLine('chartClientes', ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'], [15, 18, 25, 30, 32, 38], 'Clientes', '#22c55e');
         }
 
-        /**
-         * Muestra una pestaña específica y oculta las demás
-         * @param {string} tabId - ID de la pestaña a mostrar (ej. 'obj1')
-         */
+        // Lógica de Tabs
         function showTab(tabId) {
-            // Oculta todo el contenido de las pestañas
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            // Quita la clase 'active' de todos los botones
-            document.querySelectorAll('.nav-button').forEach(button => {
-                button.classList.remove('active');
-            });
+            // Ocultar contenidos
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+            
+            // Desactivar botones
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active', 'bg-slate-800', 'text-white'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.add('bg-white', 'text-slate-600'));
 
-            // Muestra el contenido de la pestaña seleccionada
-            document.getElementById(tabId).style.display = 'block';
-            // Añade la clase 'active' al botón seleccionado
-            document.getElementById('btn-' + tabId).classList.add('active');
+            // Mostrar actual
+            const content = document.getElementById(tabId);
+            content.classList.remove('hidden');
+            content.classList.add('block');
 
-            // Llama a la función de renderizado de gráficos específica para esa pestaña
-            // Esto evita que se rendericen gráficos en pestañas ocultas
-            if (tabId === 'obj1') renderObj1Charts();
-            if (tabId === 'obj2') renderObj2Charts();
-            if (tabId === 'obj3') renderObj3Charts();
-            if (tabId === 'obj4') renderObj4Charts();
-            if (tabId === 'obj5') renderObj5Charts();
+            // Activar botón
+            const btn = document.getElementById('btn-' + tabId);
+            btn.classList.add('active'); // La clase .active maneja el color en CSS
+            btn.classList.remove('bg-white', 'text-slate-600');
+
+            // Renderizar gráficos
+            if(tabId === 'obj1') renderObj1();
+            if(tabId === 'obj2') renderObj2();
+            if(tabId === 'obj3') renderObj3();
+            if(tabId === 'obj4') renderObj4();
+            if(tabId === 'obj5') renderObj5();
         }
 
-        // --- Inicialización ---
-        // Al cargar la página, muestra la primera pestaña por defecto
+        // Iniciar
         document.addEventListener('DOMContentLoaded', () => {
             showTab('obj1');
         });
+
     </script>
 </body>
 </html>
