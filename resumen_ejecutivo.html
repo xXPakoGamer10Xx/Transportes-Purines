@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen Ejecutivo - Transportes Purines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Merriweather', serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Inter', sans-serif; }
+        @media print {
+            @page { margin: 1cm; size: A4; }
+            body { 
+                background: white; 
+                font-size: 10pt; /* Reducir fuente base */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .no-print { display: none !important; }
+            
+            /* Ajustes del contenedor principal */
+            .max-w-4xl { 
+                max-width: none !important; 
+                width: 100% !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                box-shadow: none !important; 
+                min-height: auto !important;
+            }
+
+            /* Compactar encabezado */
+            header { 
+                margin-bottom: 1rem !important; 
+                padding-bottom: 0.5rem !important; 
+            }
+            h1 { font-size: 20pt !important; }
+            h2 { font-size: 12pt !important; margin-top: 0 !important; }
+            
+            /* Compactar secciones */
+            .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+                margin-top: 1rem !important; /* Reducir espacio entre secciones */
+            }
+            section { margin-bottom: 0.5rem !important; }
+            h3 { 
+                font-size: 11pt !important; 
+                margin-bottom: 0.25rem !important; 
+                padding-left: 0.5rem !important;
+            }
+            p, li { font-size: 9pt !important; line-height: 1.4 !important; }
+            
+            /* Grid compacta */
+            .grid { gap: 0.5rem !important; margin-top: 0.5rem !important; }
+            .bg-gray-50 { padding: 0.5rem !important; }
+            
+            /* Conclusión compacta */
+            .mt-8 { margin-top: 1rem !important; }
+            .p-6 { padding: 0.75rem !important; }
+            
+            /* Footer compacto */
+            .mt-20 { margin-top: 2rem !important; }
+            
+            /* Forzar ajuste */
+            html, body { height: 100%; overflow: hidden; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 py-10 px-4">
+
+    <!-- Botón Volver (No visible en impresión) -->
+    <div class="max-w-4xl mx-auto mb-6 flex justify-between items-center no-print">
+        <a href="#" onclick="window.close(); return false;" class="flex items-center text-blue-700 font-semibold hover:underline">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i> Cerrar y Volver
+        </a>
+        <button onclick="window.print()" class="flex items-center bg-blue-700 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-800 transition">
+            <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Imprimir Documento
+        </button>
+    </div>
+
+    <!-- Hoja del Documento -->
+    <div class="max-w-4xl mx-auto bg-white p-12 shadow-xl min-h-[1100px]">
+        
+        <!-- Encabezado -->
+        <!-- Encabezado -->
+        <header class="border-b-2 border-blue-800 pb-6 mb-10 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <!-- Logo Agregado -->
+                <div class="w-20 h-20 bg-white rounded-full border border-gray-200 p-1 shadow-sm flex-shrink-0">
+                    <img src="Logo.jpeg" alt="Logo Transportes Purines" class="w-full h-full object-cover rounded-full" onerror="this.src='https://placehold.co/80x80?text=TP'">
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Resumen Ejecutivo</h1>
+                    <h2 class="text-xl text-blue-700 mt-1">Planificación Estratégica 2025</h2>
+                </div>
+            </div>
+            <div class="text-right hidden sm:block">
+                <p class="font-bold text-gray-800">Transportes Purines S.A. de C.V.</p>
+                <p class="text-sm text-gray-500">Documento Confidencial</p>
+            </div>
+        </header>
+
+        <!-- Contenido -->
+        <div class="space-y-8 text-gray-700 leading-relaxed text-justify">
+            
+            <!-- Introducción -->
+            <section>
+                <h3 class="text-lg font-bold text-blue-900 uppercase tracking-wide border-l-4 border-blue-500 pl-3 mb-3">
+                    Introducción y Contexto
+                </h3>
+                <p>
+                    El presente plan estratégico para Transportes Purines busca transformar la operación logística en un modelo de negocio de alto valor, centrado en la calidad del servicio, el bienestar animal y la eficiencia operativa. El objetivo principal es asegurar el crecimiento sostenido de la empresa en la región a través de la expansión de la capacidad y la fidelización de clientes.
+                </p>
+            </section>
+
+            <!-- Estrategia Clave -->
+            <section>
+                <h3 class="text-lg font-bold text-blue-900 uppercase tracking-wide border-l-4 border-blue-500 pl-3 mb-3">
+                    Estrategia Clave: Calidad y Bienestar
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+                        <h4 class="font-bold text-gray-900 mb-2 text-left">Tecnología y Seguridad</h4>
+                        <p class="text-sm text-justify">Se prioriza la implementación de un sistema de monitoreo en tiempo real para garantizar la seguridad de la carga y el bienestar de los animales. Los KPIs medirán la cobertura tecnológica y la reducción de incidentes.</p>
+                    </div>
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-100">
+                        <h4 class="font-bold text-gray-900 mb-2 text-left">Capital Humano</h4>
+                        <p class="text-sm text-justify">Enfoque en capacitación especializada. Se medirá el Índice de Eficacia de la Capacitación, correlacionando la formación con la reducción de incidentes por mal manejo.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Crecimiento -->
+            <section>
+                <h3 class="text-lg font-bold text-blue-900 uppercase tracking-wide border-l-4 border-blue-500 pl-3 mb-3">
+                    Crecimiento y Eficiencia Operativa
+                </h3>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>
+                        <strong>Flota (Objetivo 1):</strong> Estrategia de expansión medida con Disponibilidad de Flota e Índice de Renuevo. Buscamos un incremento medible de rutas cubiertas.
+                    </li>
+                    <li>
+                        <strong>Alianzas (Objetivo 3):</strong> Establecer alianzas estratégicas con proveedores veterinarios y de alimentación. Los KPIs seguirán convenios firmados y colaboraciones activas.
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Posicionamiento -->
+            <section>
+                <h3 class="text-lg font-bold text-blue-900 uppercase tracking-wide border-l-4 border-blue-500 pl-3 mb-3">
+                    Posicionamiento de Marca
+                </h3>
+                <p>
+                    Para sustentar el crecimiento, nos centraremos en una campaña de marketing que posicione a Transportes Purines como un líder seguro y confiable. Se medirán los resultados por el alcance, reconocimiento de marca y crecimiento de la base de clientes nuevos.
+                </p>
+            </section>
+
+            <!-- Conclusión -->
+            <section class="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-800 mt-8">
+                <h4 class="font-bold text-blue-900 mb-2 text-left">Conclusión</h4>
+                <p class="text-sm font-medium text-justify">
+                    La ejecución de estos objetivos interconectados permitirá a Transportes Purines lograr su consolidación de liderazgo en la región, manteniendo altos estándares de calidad y bienestar animal, y optimizando la eficiencia de sus activos.
+                </p>
+            </section>
+
+        </div>
+
+        <!-- Footer del Documento -->
+        <footer class="mt-20 pt-6 border-t border-gray-300 flex justify-between text-xs text-gray-500">
+            <span>Generado digitalmente por Sistema de Gestión Purines</span>
+            <span>Página 1 de 1</span>
+        </footer>
+
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -10,8 +10,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Iconos (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Leaflet CSS (Mapas) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     
     <script>
+        // SOLUCIÓN DEFINITIVA AL ERROR DE REFRESCO (Scroll al inicio forzado)
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        
+        // Limpiar el hash de la URL sin recargar
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            window.scrollTo(0, 0);
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 50);
+        });
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -22,7 +45,8 @@
                         purines: {
                             blue: '#1E3A8A',
                             light: '#3B82F6',
-                            accent: '#2563EB'
+                            accent: '#2563EB',
+                            dark: '#0f172a'
                         }
                     }
                 }
@@ -30,115 +54,49 @@
         }
     </script>
     <style>
-        /* Estilos personalizados para el Organigrama */
-        .tree ul {
-            padding-top: 20px; position: relative;
-            transition: all 0.5s;
-            display: flex; justify-content: center;
-        }
-        .tree li {
-            float: left; text-align: center;
-            list-style-type: none;
-            position: relative;
-            padding: 20px 5px 0 5px;
-            transition: all 0.5s;
-        }
-        /* Conectores del árbol */
-        .tree li::before, .tree li::after {
-            content: ''; position: absolute; top: 0; right: 50%;
-            border-top: 2px solid #ccc; width: 50%; height: 20px;
-        }
-        .tree li::after {
-            right: auto; left: 50%; border-left: 2px solid #ccc;
-        }
-        .tree li:only-child::after, .tree li:only-child::before {
-            display: none;
-        }
+        /* Estilos del Organigrama */
+        .tree ul { padding-top: 20px; position: relative; transition: all 0.5s; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; transition: all 0.5s; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #ccc; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #ccc; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
         .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after {
-            border: 0 none;
-        }
-        .tree li:last-child::before{
-            border-right: 2px solid #ccc;
-            border-radius: 0 5px 0 0;
-        }
-        .tree li:first-child::after{
-            border-radius: 5px 0 0 0;
-        }
-        .tree ul ul::before{
-            content: ''; position: absolute; top: 0; left: 50%;
-            border-left: 2px solid #ccc; width: 0; height: 20px;
-        }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before{ border-right: 2px solid #ccc; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after{ border-radius: 5px 0 0 0; }
+        .tree ul ul::before{ content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #ccc; width: 0; height: 20px; }
         
-        /* Tarjetas del organigrama */
-        .org-card {
-            border: 1px solid #e2e8f0;
-            padding: 10px;
-            text-decoration: none;
-            color: #1e293b;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            display: inline-block;
-            border-radius: 8px;
-            transition: all 0.3s;
-            background: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            min-width: 140px;
-            z-index: 10;
-            position: relative;
-        }
-        .org-card:hover {
-            background: #eff6ff;
-            border-color: #2563EB;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
-        }
+        .org-card { border: 1px solid #e2e8f0; padding: 10px; text-decoration: none; color: #1e293b; font-family: 'Inter', sans-serif; font-size: 14px; display: inline-block; border-radius: 8px; transition: all 0.3s; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); min-width: 140px; z-index: 10; position: relative; }
+        .org-card:hover { background: #eff6ff; border-color: #2563EB; transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); }
         .org-role { font-weight: 700; color: #1E3A8A; display: block; margin-bottom: 4px; }
         .org-name { font-size: 0.9em; color: #475569; }
 
-        /* Timeline Vertical */
-        .timeline-item {
-            position: relative;
-            padding-left: 2rem;
-            border-left: 2px solid #e2e8f0;
-            padding-bottom: 2rem;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -9px;
-            top: 0;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #3B82F6;
-            border: 2px solid white;
-            box-shadow: 0 0 0 2px #3B82F6;
-        }
+        /* Timeline */
+        .timeline-item { position: relative; padding-left: 2rem; border-left: 2px solid #e2e8f0; padding-bottom: 2rem; }
+        .timeline-item::before { content: ''; position: absolute; left: -9px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: #3B82F6; border: 2px solid white; box-shadow: 0 0 0 2px #3B82F6; }
         .timeline-item:last-child { border-left: none; }
 
-        /* Animaciones de entrada */
-        .fade-in-up {
-            animation: fadeInUp 0.8s ease-out forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* Animaciones */
+        .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
         
-        /* Ajustes Mobile para Organigrama */
+        /* Mobile Organigrama */
         @media (max-width: 768px) {
             .tree ul { flex-direction: column; align-items: center; padding-top: 0; }
             .tree li { width: 100%; padding: 10px 0; }
-            .tree li::before, .tree li::after, .tree ul ul::before { display: none; } /* Ocultar líneas en móvil */
+            .tree li::before, .tree li::after, .tree ul ul::before { display: none; }
             .tree ul ul { padding-left: 0; }
             .org-card { width: 90%; margin: 0 auto; display: block; }
             .connector-mobile { display: block; height: 20px; width: 2px; background: #ccc; margin: 0 auto; }
         }
-        @media (min-width: 769px) {
-            .connector-mobile { display: none; }
-        }
+        @media (min-width: 769px) { .connector-mobile { display: none; } }
+
+        /* Estilos Mapa Leaflet */
+        .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); cursor: pointer; }
+        .leaflet-popup-content { margin: 12px; font-family: 'Inter', sans-serif; }
+        .leaflet-container { cursor: grab; }
+        /* Cursor pointer para el marcador */
+        .custom-div-icon { cursor: pointer !important; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -151,10 +109,11 @@
                 <span class="font-bold text-purines-blue text-lg hidden sm:block">Transportes Purines</span>
             </div>
             <div class="flex gap-1 sm:gap-6 text-sm sm:text-base font-medium">
+                <a href="#identidad" class="hover:text-purines-light px-2 py-1">Nosotros</a>
                 <a href="#objetivo" class="hover:text-purines-light px-2 py-1">Objetivo</a>
                 <a href="#equipo" class="hover:text-purines-light px-2 py-1">Equipo</a>
-                <a href="#cronograma" class="hover:text-purines-light px-2 py-1">Cronograma</a>
-                <a href="#foda" class="hover:text-purines-light px-2 py-1">Estrategia</a>
+                <a href="#calidad" class="hover:text-purines-light px-2 py-1">Calidad</a>
+                <a href="#ubicacion" class="hover:text-purines-light px-2 py-1">Ubicación</a>
             </div>
             <a href="dashboard.html" class="bg-purines-blue text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-800 transition-colors hidden md:block">
                 Ir al Dashboard
@@ -162,7 +121,7 @@
         </div>
     </nav>
 
-    <!-- Hero Section / Introducción -->
+    <!-- Hero Section -->
     <header class="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white pt-32 pb-20 px-4 overflow-hidden">
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519003722824-194d4455a60c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10"></div>
         <div class="container mx-auto text-center relative z-10 fade-in-up">
@@ -173,11 +132,61 @@
             <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10">
                 Conoce nuestra hoja de ruta para transformar la logística agropecuaria en México.
             </p>
-            <a href="#objetivo" class="inline-flex items-center gap-2 bg-white text-blue-900 px-6 py-3 rounded-full font-bold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg">
-                <i data-lucide="arrow-down-circle"></i> Explorar Estrategia
+            <a href="#calidad" class="inline-flex items-center gap-2 bg-white text-blue-900 px-6 py-3 rounded-full font-bold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg">
+                <i data-lucide="shield-check"></i> Ver Protocolos
             </a>
         </div>
     </header>
+
+    <!-- 0. IDENTIDAD CORPORATIVA -->
+    <section id="identidad" class="py-20 bg-slate-50 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-blue-600 font-semibold bg-blue-100 px-3 py-1 rounded-full text-sm">Nuestra Esencia</span>
+                <h2 class="text-3xl font-bold mt-3 text-slate-900">Misión y Visión</h2>
+                <p class="text-slate-500 mt-2 max-w-2xl mx-auto">
+                    Los pilares fundamentales que guían cada kilómetro que recorremos y cada decisión que tomamos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="rocket" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Nuestra Misión</h3>
+                    <p class="text-slate-600 leading-relaxed text-justify">
+                        Proporcionar servicios de transporte porcino de alta calidad, asegurando el bienestar animal y la eficiencia operativa en cada etapa del proceso. Nos comprometemos a cumplir con los más altos estándares de seguridad, higiene y puntualidad, ofreciendo soluciones logísticas innovadoras que satisfagan las necesidades de nuestros clientes y contribuyan al desarrollo sostenible de la industria porcina.
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 hover:shadow-xl transition-all duration-300 group">
+                    <div class="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="eye" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Nuestra Visión</h3>
+                    <p class="text-slate-600 leading-relaxed text-justify">
+                        Ser líderes en el sector de transporte porcino, reconocidos por nuestra excelencia de servicio, responsabilidad social y ambiental. Estableciendo nuevas estrategias para el bienestar animal durante su transporte y la sostenibilidad, convirtiéndonos en el socio preferido para las granjas y productores porcinos de todo el mundo.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-6 mt-12">
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm">
+                    <i data-lucide="shield" class="w-4 h-4"></i> Responsabilidad
+                </span>
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm">
+                    <i data-lucide="users" class="w-4 h-4"></i> Respeto
+                </span>
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm">
+                    <i data-lucide="lock" class="w-4 h-4"></i> Seguridad
+                </span>
+            </div>
+        </div>
+    </section>
 
     <!-- 1. OBJETIVO ESPECÍFICO -->
     <section id="objetivo" class="py-20 bg-white">
@@ -186,15 +195,14 @@
                 <div class="md:w-1/2 relative">
                     <div class="absolute -top-4 -left-4 w-20 h-20 bg-blue-100 rounded-full -z-10"></div>
                     <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-yellow-50 rounded-full -z-10"></div>
-                    <!-- Placeholder visual si no hay imagen, o usar logo -->
                     <div class="bg-gradient-to-tr from-blue-600 to-blue-400 rounded-2xl p-8 text-white shadow-2xl rotate-1 hover:rotate-0 transition-transform duration-500">
                         <i data-lucide="target" class="w-16 h-16 mb-4 text-white/80"></i>
-                        <h3 class="text-2xl font-bold mb-2">Nuestra Meta Principal</h3>
-                        <p class="opacity-90">El norte que guía todas nuestras operaciones.</p>
+                        <h3 class="text-2xl font-bold mb-2">Objetivo Específico</h3>
+                        <p class="opacity-90">El norte que guía nuestras operaciones.</p>
                     </div>
                 </div>
                 <div class="md:w-1/2">
-                    <h2 class="text-blue-900 font-bold text-sm tracking-wider uppercase mb-2">Objetivo Específico</h2>
+                    <h2 class="text-blue-900 font-bold text-sm tracking-wider uppercase mb-2">Meta 2025</h2>
                     <h3 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-snug">
                         Liderazgo en Logística Agropecuaria
                     </h3>
@@ -202,15 +210,15 @@
                         "Nuestra meta es posicionar a Transportes Purines como el referente nacional en el transporte especializado de sector porcino. Lograremos este liderazgo mediante la ampliación de nuestra capacidad operativa, el monitoreo en tiempo real de activos, la profesionalización de nuestro equipo y el fortalecimiento de nuestra presencia de marca en el mercado."
                     </div>
                     <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                        <div class="p-4 bg-slate-50 rounded-lg">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
                             <i data-lucide="trending-up" class="w-6 h-6 mx-auto text-blue-600 mb-2"></i>
                             <span class="font-semibold text-sm">Rentabilidad</span>
                         </div>
-                        <div class="p-4 bg-slate-50 rounded-lg">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
                             <i data-lucide="truck" class="w-6 h-6 mx-auto text-blue-600 mb-2"></i>
                             <span class="font-semibold text-sm">Optimización</span>
                         </div>
-                        <div class="p-4 bg-slate-50 rounded-lg">
+                        <div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
                             <i data-lucide="smile" class="w-6 h-6 mx-auto text-blue-600 mb-2"></i>
                             <span class="font-semibold text-sm">Satisfacción</span>
                         </div>
@@ -228,19 +236,14 @@
                 <h2 class="text-3xl font-bold mt-3 text-slate-900">Nuestro Equipo Directivo</h2>
                 <p class="text-slate-500 mt-2">La cadena de mando que asegura la eficiencia.</p>
             </div>
-
-            <!-- Estructura del Árbol -->
             <div class="tree flex justify-center">
                 <ul>
                     <li>
-                        <!-- CEO -->
                         <a href="#" class="org-card border-l-4 border-l-blue-800">
                             <div class="w-12 h-12 bg-blue-100 rounded-full mx-auto mb-2 flex items-center justify-center text-2xl">👑</div>
                             <span class="org-role">Dirección General</span>
                             <span class="org-name">Emiliano Tapia Armijo</span>
                         </a>
-                        
-                        <!-- Nivel 2 -->
                         <ul>
                             <li>
                                 <div class="connector-mobile"></div>
@@ -274,6 +277,14 @@
                                     <span class="org-name">Jiménez Ortiz<br>Eduardo</span>
                                 </a>
                             </li>
+                            <li>
+                                <div class="connector-mobile"></div>
+                                <a href="#" class="org-card">
+                                    <div class="w-10 h-10 bg-cyan-100 rounded-full mx-auto mb-2 flex items-center justify-center">📋</div>
+                                    <span class="org-role text-cyan-700">Administrativo</span>
+                                    <span class="org-name">Alejandro Galván<br>García</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -285,7 +296,6 @@
     <section id="cronograma" class="py-20 bg-white">
         <div class="container mx-auto px-4">
             <div class="flex flex-col lg:flex-row gap-12">
-                <!-- Título Sticky -->
                 <div class="lg:w-1/3">
                     <div class="sticky top-24">
                         <span class="text-blue-600 font-bold tracking-widest uppercase text-sm">Planificación Anual</span>
@@ -306,100 +316,142 @@
                     </div>
                 </div>
 
-                <!-- Timeline Scrollable -->
                 <div class="lg:w-2/3 relative">
                     <div class="absolute top-0 bottom-0 left-[7px] w-0.5 bg-slate-200"></div>
-                    
-                    <!-- Enero -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Enero</span>
                         <h3 class="text-lg font-bold text-slate-800">Revisión de Unidades</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-blue-600 font-medium">Gerente de Operaciones</span></p>
                     </div>
-
-                    <!-- Febrero -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Febrero</span>
                         <h3 class="text-lg font-bold text-slate-800">Mantenimiento Preventivo</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-blue-600 font-medium">Gerente de Operaciones</span></p>
                     </div>
-
-                    <!-- Marzo -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Marzo</span>
                         <h3 class="text-lg font-bold text-slate-800">Revisión Sanitaria de la Unidad</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-red-600 font-medium">Gerente de Bioseguridad</span></p>
                     </div>
-
-                    <!-- Abril -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Abril</span>
                         <h3 class="text-lg font-bold text-slate-800">Actualización de Registros</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-green-600 font-medium">Gerente Administrativo</span></p>
                     </div>
-
-                    <!-- Mayo -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Mayo</span>
                         <h3 class="text-lg font-bold text-slate-800">Control y Costos</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-green-600 font-medium">Gerente Administrativo</span></p>
                     </div>
-
-                    <!-- Junio -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Junio</span>
                         <h3 class="text-lg font-bold text-slate-800">Mantenimiento General</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-blue-600 font-medium">Gerente de Operaciones</span></p>
                     </div>
-
-                    <!-- Julio -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Julio</span>
                         <h3 class="text-lg font-bold text-slate-800">Capacitación del Personal</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-green-600 font-medium">Gerente Administrativo</span></p>
                     </div>
-
-                    <!-- Agosto -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Agosto</span>
                         <h3 class="text-lg font-bold text-slate-800">Control Sanitario</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-red-600 font-medium">Gerente de Bioseguridad</span></p>
                     </div>
-
-                    <!-- Septiembre -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Septiembre</span>
                         <h3 class="text-lg font-bold text-slate-800">Renovación de Permisos</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-green-600 font-medium">Gerente Administrativo</span></p>
                     </div>
-
-                    <!-- Octubre -->
                     <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Octubre</span>
                         <h3 class="text-lg font-bold text-slate-800">Revisión de Rutas</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-blue-600 font-medium">Gerente de Operaciones</span></p>
                     </div>
-                    
-                     <!-- Noviembre -->
                      <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Noviembre</span>
                         <h3 class="text-lg font-bold text-slate-800">Evaluación de Desempeño</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-green-600 font-medium">Gerente Administrativo</span></p>
                     </div>
-
-                     <!-- Diciembre -->
                      <div class="timeline-item group hover:bg-slate-50 transition-colors rounded-r-lg p-4 border-none">
                         <span class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1 block">Diciembre</span>
                         <h3 class="text-lg font-bold text-slate-800">Transporte, Limpieza Final y Cierre</h3>
                         <p class="text-slate-500 text-sm">Responsable: <span class="text-red-600 font-medium">Gerente de Bioseguridad</span></p>
                     </div>
-
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 4. FODA CRUZADO -->
+    <!-- === PROTOCOLOS Y DOCUMENTOS === -->
+    <section id="calidad" class="py-20 bg-slate-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <span class="text-green-600 font-semibold bg-green-100 px-3 py-1 rounded-full text-sm">Protocolo de Excelencia</span>
+                <h2 class="text-3xl font-bold mt-3 text-slate-900">Estándares de Calidad y Seguridad</h2>
+                <p class="text-slate-500 mt-2 max-w-2xl mx-auto">
+                    No solo transportamos, cuidamos. Cada unidad pasa por nuestro riguroso 
+                    <strong>Diagnóstico Operativo de 12 Puntos</strong> antes de cada viaje.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Condiciones de la Unidad</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0"></i><span class="text-sm text-slate-600">Unidad lavada y desinfectada.</span></li>
+                        <li class="flex items-start gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0"></i><span class="text-sm text-slate-600">Niveles de fluidos óptimos.</span></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center mb-6">
+                        <i data-lucide="heart" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Bienestar Animal</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0"></i><span class="text-sm text-slate-600">Respeto a densidad de carga.</span></li>
+                        <li class="flex items-start gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0"></i><span class="text-sm text-slate-600">Plan de ruta anti-estrés.</span></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center mb-6">
+                        <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Bioseguridad Total</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0"></i><span class="text-sm text-slate-600">EPP completo y limpio.</span></li>
+                        <li class="flex items-start gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-green-500 shrink-0"></i><span class="text-sm text-slate-600">GPS verificado.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-16 bg-slate-900 rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full filter blur-3xl opacity-20 -mr-16 -mt-16"></div>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div class="text-white md:w-2/3">
+                        <h3 class="text-2xl font-bold mb-4">Transparencia Corporativa</h3>
+                        <p class="text-slate-300 mb-6">Accede a nuestros documentos oficiales y conoce cómo planeamos consolidarnos como líderes.</p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="resumen_ejecutivo.html" target="_blank" class="group flex items-center gap-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl p-4 transition-all w-full sm:w-auto">
+                                <div class="bg-red-500/20 p-2 rounded-lg text-red-400"><i data-lucide="file-text" class="w-6 h-6"></i></div>
+                                <div><div class="text-sm font-semibold text-white group-hover:text-blue-200">Resumen Ejecutivo</div><div class="text-xs text-slate-400">Ver Documento</div></div>
+                            </a>
+                            <a href="checklist_operativo.html" target="_blank" class="group flex items-center gap-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl p-4 transition-all w-full sm:w-auto">
+                                <div class="bg-blue-500/20 p-2 rounded-lg text-blue-400"><i data-lucide="clipboard-check" class="w-6 h-6"></i></div>
+                                <div><div class="text-sm font-semibold text-white group-hover:text-blue-200">Checklist Operativo</div><div class="text-xs text-slate-400">Ver Formato</div></div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="md:w-1/3 flex justify-center"><i data-lucide="shield-check" class="w-32 h-32 text-blue-500 opacity-50"></i></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. FODA CRUZADO (Diseño Oscuro) -->
     <section id="foda" class="py-20 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
@@ -409,132 +461,115 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- FO: Fortalezas + Oportunidades -->
                 <div class="bg-white text-slate-800 rounded-xl p-6 shadow-xl border-t-4 border-green-500 hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
-                        <div class="bg-green-100 p-3 rounded-lg text-green-600">
-                            <i data-lucide="zap" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-900">Estrategias FO</h3>
-                            <span class="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Ofensivas</span>
-                        </div>
+                        <div class="bg-green-100 p-3 rounded-lg text-green-600"><i data-lucide="zap" class="w-6 h-6"></i></div>
+                        <div><h3 class="text-xl font-bold text-slate-900">Estrategias FO</h3><span class="text-xs font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Ofensivas</span></div>
                     </div>
                     <ul class="space-y-3">
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-1 shrink-0"></i>
-                            <p>Aprovechar el cumplimiento de normas y el conocimiento técnico para certificarse como empresa segura y responsable.</p>
-                        </li>
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-1 shrink-0"></i>
-                            <p>Promocionar la empresa destacando la flota nueva, el cumplimiento sanitario y el trato ético a los animales.</p>
-                        </li>
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-green-500 mt-1 shrink-0"></i>
-                            <p>Buscar convenios con productores que valoren la trazabilidad y seguridad sanitaria.</p>
-                        </li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-green-500 mt-1 shrink-0"></i><p>Aprovechar el cumplimiento de normas y el conocimiento técnico para certificarse como empresa segura y responsable.</p></li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-green-500 mt-1 shrink-0"></i><p>Promocionar la empresa destacando la flota nueva, el cumplimiento sanitario y el trato ético a los animales.</p></li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-green-500 mt-1 shrink-0"></i><p>Buscar convenios con productores que valoren la trazabilidad y seguridad sanitaria.</p></li>
                     </ul>
                 </div>
 
-                <!-- DO: Debilidades + Oportunidades -->
                 <div class="bg-white text-slate-800 rounded-xl p-6 shadow-xl border-t-4 border-blue-500 hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
-                        <div class="bg-blue-100 p-3 rounded-lg text-blue-600">
-                            <i data-lucide="arrow-up-circle" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-900">Estrategias DO</h3>
-                            <span class="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Adaptativas</span>
-                        </div>
+                        <div class="bg-blue-100 p-3 rounded-lg text-blue-600"><i data-lucide="arrow-up-circle" class="w-6 h-6"></i></div>
+                        <div><h3 class="text-xl font-bold text-slate-900">Estrategias DO</h3><span class="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Adaptativas</span></div>
                     </div>
                     <ul class="space-y-3">
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-blue-500 mt-1 shrink-0"></i>
-                            <p>Buscar alianzas con granjas locales para asegurar volumen constante de trabajo y reducir la dependencia de pocos clientes.</p>
-                        </li>
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-blue-500 mt-1 shrink-0"></i>
-                            <p>Aprovechar programas de capacitación continua para formar un equipo operativo más competitivo.</p>
-                        </li>
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-blue-500 mt-1 shrink-0"></i>
-                            <p>Implementar controles digitales de bioseguridad (Limpieza, desinfección, rastreo) para profesionalizar la gestión.</p>
-                        </li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-blue-500 mt-1 shrink-0"></i><p>Buscar alianzas con granjas locales para asegurar volumen constante de trabajo y reducir la dependencia de pocos clientes.</p></li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-blue-500 mt-1 shrink-0"></i><p>Aprovechar programas de capacitación continua para formar un equipo operativo más competitivo.</p></li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-blue-500 mt-1 shrink-0"></i><p>Implementar controles digitales de bioseguridad (Limpieza, desinfección, rastreo) para profesionalizar la gestión.</p></li>
                     </ul>
                 </div>
 
-                <!-- FA: Fortalezas + Amenazas -->
                 <div class="bg-white text-slate-800 rounded-xl p-6 shadow-xl border-t-4 border-orange-500 hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
-                        <div class="bg-orange-100 p-3 rounded-lg text-orange-600">
-                            <i data-lucide="shield" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-900">Estrategias FA</h3>
-                            <span class="text-xs font-semibold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">Defensivas</span>
-                        </div>
+                        <div class="bg-orange-100 p-3 rounded-lg text-orange-600"><i data-lucide="shield" class="w-6 h-6"></i></div>
+                        <div><h3 class="text-xl font-bold text-slate-900">Estrategias FA</h3><span class="text-xs font-semibold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">Defensivas</span></div>
                     </div>
                     <ul class="space-y-3">
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-orange-500 mt-1 shrink-0"></i>
-                            <p>Adaptar las rutas y mantenimiento para minimizar los costos de combustible y desgaste por malas condiciones de camino.</p>
-                        </li>
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-orange-500 mt-1 shrink-0"></i>
-                            <p>Reforzar la limpieza y trazabilidad sanitaria para diferenciarse frente a empresas competitivas.</p>
-                        </li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-orange-500 mt-1 shrink-0"></i><p>Adaptar las rutas y mantenimiento para minimizar los costos de combustible y desgaste por malas condiciones de camino.</p></li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-orange-500 mt-1 shrink-0"></i><p>Reforzar la limpieza y trazabilidad sanitaria para diferenciarse frente a empresas competitivas.</p></li>
                     </ul>
                 </div>
 
-                <!-- DA: Debilidades + Amenazas -->
                 <div class="bg-white text-slate-800 rounded-xl p-6 shadow-xl border-t-4 border-red-500 hover:shadow-2xl transition-all duration-300">
                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-100">
-                        <div class="bg-red-100 p-3 rounded-lg text-red-600">
-                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-900">Estrategias DA</h3>
-                            <span class="text-xs font-semibold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Supervivencia</span>
-                        </div>
+                        <div class="bg-red-100 p-3 rounded-lg text-red-600"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
+                        <div><h3 class="text-xl font-bold text-slate-900">Estrategias DA</h3><span class="text-xs font-semibold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">Supervivencia</span></div>
                     </div>
                     <ul class="space-y-3">
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-red-500 mt-1 shrink-0"></i>
-                            <p>Mantener relaciones sólidas con talleres y proveedores locales para evitar gastos excesivos en el mantenimiento.</p>
-                        </li>
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-red-500 mt-1 shrink-0"></i>
-                            <p>Ofrecer promociones o descuentos por contrato anual para mantener estabilidad financiera.</p>
-                        </li>
-                        <li class="flex items-start gap-2 text-sm">
-                            <i data-lucide="check" class="w-4 h-4 text-red-500 mt-1 shrink-0"></i>
-                            <p>Planificar rutas eficientes y compartidas con otros productores para reducir costos de operación.</p>
-                        </li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-red-500 mt-1 shrink-0"></i><p>Mantener relaciones sólidas con talleres y proveedores locales para evitar gastos excesivos en el mantenimiento.</p></li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-red-500 mt-1 shrink-0"></i><p>Ofrecer promociones o descuentos por contrato anual para mantener estabilidad financiera.</p></li>
+                        <li class="flex items-start gap-2 text-sm"><i data-lucide="check" class="w-4 h-4 text-red-500 mt-1 shrink-0"></i><p>Planificar rutas eficientes y compartidas con otros productores para reducir costos de operación.</p></li>
                     </ul>
                 </div>
-
             </div>
+        </div>
+    </section>
+
+    <!-- 5. UBICACIÓN Y MAPA (Leaflet - Sin Key) -->
+    <section id="ubicacion" class="py-20 bg-slate-900 text-white relative">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row gap-12 items-center">
+            
+            <div class="md:w-1/2">
+                <span class="text-blue-400 font-semibold uppercase text-sm tracking-widest mb-2 block">Nuestra Base Operativa</span>
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Ubicación Estratégica</h2>
+                <p class="text-slate-300 mb-8 text-lg">
+                    Operamos desde el corazón de México para garantizar la conectividad y eficiencia en todas nuestras rutas.
+                </p>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-blue-600/20 p-3 rounded-lg text-blue-400">
+                            <i data-lucide="map-pin" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-white">Dirección</h4>
+                            <p class="text-slate-400">González 17, San Miguel Coatlinchan,<br>56250 Texcoco de Mora, Méx.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4">
+                        <div class="bg-blue-600/20 p-3 rounded-lg text-blue-400">
+                            <i data-lucide="clock" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-white">Horario de Operaciones</h4>
+                            <p class="text-slate-400">Lunes a Sábado: 7:00 AM - 8:00 PM<br>Domingo: Urgencias y Monitoreo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="https://maps.google.com/maps?q=González+17,+San+Miguel+Coatlinchan,+56250+Texcoco+de+Mora,+Méx." target="_blank" class="mt-8 inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    <i data-lucide="navigation"></i> Cómo llegar
+                </a>
+            </div>
+
+            <!-- Contenedor del Mapa -->
+            <div class="md:w-1/2 w-full h-[400px] bg-slate-800 rounded-2xl overflow-hidden shadow-2xl border border-slate-700 relative z-0">
+                <div id="map" class="w-full h-full relative z-0"></div>
+            </div>
+
         </div>
     </section>
 
     <!-- CALL TO ACTION FINAL -->
     <section class="py-24 bg-gradient-to-r from-blue-600 to-blue-800 text-center relative overflow-hidden">
-        <!-- Decoración -->
         <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
-        
         <div class="container mx-auto px-4 relative z-10">
             <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">
                 De la Estrategia a la Acción
             </h2>
             <p class="text-blue-100 text-xl max-w-2xl mx-auto mb-10">
-                Ahora que conoces nuestros planes y estructura, revisa cómo estamos ejecutando estos objetivos en tiempo real.
+                Ahora que conoces nuestros planes y ubicación, revisa cómo estamos ejecutando estos objetivos.
             </p>
-            
             <a href="dashboard.html" class="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-blue-900 transition-all duration-200 bg-white font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:bg-gray-100 hover:scale-105 shadow-2xl">
                 Ver Dashboard Operativo
                 <i data-lucide="bar-chart-2" class="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform"></i>
-                <div class="absolute -inset-3 rounded-xl bg-white/20 blur opacity-0 group-hover:opacity-100 transition duration-200"></div>
             </a>
         </div>
     </section>
@@ -544,9 +579,53 @@
         <p>&copy; 2025 Transportes Purines. Todos los derechos reservados.</p>
     </footer>
 
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
         // Inicializar iconos
         lucide.createIcons();
+
+        // Inicializar Mapa con Leaflet (No requiere API Key)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Coordenadas exactas
+            var lat = 19.488889;
+            var lng = -98.874722;
+
+            var map = L.map('map').setView([lat, lng], 16);
+
+            // Capa de mapa a color (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Icono personalizado que salta (animación CSS)
+            var bouncingIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div class="relative">
+                        <div class="w-12 h-12 text-red-600 animate-bounce drop-shadow-2xl filter">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3" fill="white"></circle>
+                            </svg>
+                        </div>
+                        <div class="w-8 h-2 bg-black/30 rounded-full blur-sm absolute -bottom-2 left-2 animate-pulse"></div>
+                       </div>`,
+                iconSize: [48, 48],
+                iconAnchor: [24, 48],
+                popupAnchor: [0, -50]
+            });
+
+            var marker = L.marker([lat, lng], { icon: bouncingIcon }).addTo(map);
+            
+            // Agregar evento click al marcador para abrir Google Maps
+            marker.on('click', function() {
+                window.open('https://maps.google.com/maps?q=González+17,+San+Miguel+Coatlinchan,+56250+Texcoco+de+Mora,+Méx.', '_blank');
+            });
+
+            // También abrir al hacer clic en el popup (por si acaso)
+            marker.bindPopup('<div class="text-center cursor-pointer" onclick="window.open(\'https://maps.google.com/maps?q=González+17,+San+Miguel+Coatlinchan,+56250+Texcoco+de+Mora,+Méx.\', \'_blank\')"><h3 class="font-bold text-blue-900">Transportes Purines</h3><p class="text-xs text-slate-500">Base Operativa<br><span class="text-blue-600 font-bold underline">¡Clic aquí para ir!</span></p></div>')
+                .openPopup();
+        });
     </script>
 </body>
 </html>
